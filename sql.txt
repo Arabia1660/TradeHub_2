@@ -1,0 +1,105 @@
+-- Create the 'trading' database
+CREATE DATABASE IF NOT EXISTS trading;
+
+-- Use the 'trading' database
+USE trading;
+
+-- Create 'users' table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY, 
+    name VARCHAR(100) NOT NULL, 
+    email VARCHAR(150) UNIQUE NOT NULL, 
+    password VARCHAR(255) NOT NULL,               
+    isAdmin BOOLEAN DEFAULT false,
+    address VARCHAR(255),
+    company VARCHAR(255),
+    balance DOUBLE DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert a sample user
+INSERT INTO users (name, email, password, isAdmin)
+VALUES ('THB', 'thb@gmail.com', '123456', true);
+
+-- Create 'investments' table
+CREATE TABLE IF NOT EXISTS investments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    stock_symbol VARCHAR(10) NOT NULL,
+    quantity INT NOT NULL,
+    buy_price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create 'transactions' table
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    stock_symbol VARCHAR(10) NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    transaction_type ENUM('buy', 'sell') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create 'stock_prices' table
+CREATE TABLE IF NOT EXISTS stock_prices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    stock_symbol VARCHAR(10) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS stock_symbols (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    stock_symbol VARCHAR(10) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO stock_symbols (stock_symbol)
+VALUES ('IBM');
+
+CREATE TABLE IF NOT EXISTS currency_symbols (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    stock_symbol VARCHAR(10) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO currency_symbols (stock_symbol)
+VALUES ('BDT');
+
+CREATE TABLE IF NOT EXISTS banks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    method VARCHAR(10) NOT NULL,
+    account VARCHAR(15) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS deposit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tnx_id VARCHAR(10) NOT NULL,
+    amount DOUBLE NOT NULL,
+    status ENUM('PENDING', 'REJECTED','ACCEPTED') DEFAULT 'PENDING',
+    bankId INT NOT NULL,
+    userId INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS withdraw (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    account_no VARCHAR(15) NOT NULL,
+    amount DOUBLE NOT NULL,
+    status ENUM('PENDING', 'REJECTED','ACCEPTED') DEFAULT 'PENDING',
+    bankId INT NOT NULL,
+    userId INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS news (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content VARCHAR(100) NOT NULL,
+    userId INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
